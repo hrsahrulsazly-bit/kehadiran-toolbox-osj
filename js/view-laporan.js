@@ -98,6 +98,7 @@ const ViewLaporan = (() => {
       previewEl.innerHTML = `
         <div class="report-title">PERJUMPAAN TOOLBOX OPERASI SUBANG JAYA 2026</div>
         <div class="report-meta">HARI: <b>${Utils.hariFromDateStr(state.date)}</b> &nbsp;•&nbsp; TARIKH: <b>${Utils.displayDate(state.date)}</b></div>
+        <div class="report-meta">LOKASI: <b>${Utils.escapeHtml(Store.getLokasi(state.date) || "-")}</b></div>
         <div class="table-scroll">
           <table class="report-table">
             <thead><tr><th>BIL</th><th>JAWATAN</th><th>NAMA</th><th>HADIR</th><th>TIDAK HADIR</th><th>CATATAN</th></tr></thead>
@@ -119,6 +120,7 @@ const ViewLaporan = (() => {
         <div class="report-title">LAPORAN KEHADIRAN BULANAN</div>
         <div class="report-meta">BULAN: <b>${Utils.displayYearMonth(state.yearMonth)}</b> &nbsp;•&nbsp; HARI PERJUMPAAN: <b>${dates.length}</b></div>
         ${dates.length === 0 ? `<div class="empty-state"><span class="icon">📭</span>Tiada rekod untuk bulan ini.</div>` : `
+        <div class="report-meta"><b>Lokasi ikut tarikh:</b> ${dates.map((d) => `${Utils.displayDate(d)} (${Utils.escapeHtml(Store.getLokasi(d) || "-")})`).join(" &nbsp;•&nbsp; ")}</div>
         <div class="table-scroll">
           <table class="report-table">
             <thead><tr><th>BIL</th><th>JAWATAN</th><th>NAMA</th><th>JUMLAH HADIR</th><th>JUMLAH TIDAK HADIR</th><th>% KEHADIRAN</th></tr></thead>
@@ -146,8 +148,9 @@ const ViewLaporan = (() => {
       doc.text("PERJUMPAAN TOOLBOX OPERASI SUBANG JAYA 2026", 105, 15, { align: "center" });
       doc.setFontSize(10);
       doc.text(`HARI: ${Utils.hariFromDateStr(state.date)}    TARIKH: ${Utils.displayDate(state.date)}`, 14, 23);
+      doc.text(`LOKASI: ${Store.getLokasi(state.date) || "-"}`, 14, 29);
       doc.autoTable({
-        startY: 28,
+        startY: 34,
         head: [["BIL", "JAWATAN", "NAMA", "HADIR", "TIDAK HADIR", "CATATAN"]],
         body: data.map((r) => [r.bil, r.jawatan, r.nama, r.hadir, r.tidakHadir, r.catatan]),
         styles: { fontSize: 8 },
@@ -161,8 +164,11 @@ const ViewLaporan = (() => {
       doc.text("LAPORAN KEHADIRAN BULANAN", 105, 15, { align: "center" });
       doc.setFontSize(10);
       doc.text(`BULAN: ${Utils.displayYearMonth(state.yearMonth)}    HARI PERJUMPAAN: ${dates.length}`, 14, 23);
+      const lokasiLine = `Lokasi ikut tarikh: ${dates.map((d) => `${Utils.displayDate(d)} (${Store.getLokasi(d) || "-"})`).join("  |  ")}`;
+      const lokasiLines = doc.splitTextToSize(lokasiLine, 180);
+      doc.text(lokasiLines, 14, 29);
       doc.autoTable({
-        startY: 28,
+        startY: 29 + lokasiLines.length * 5,
         head: [["BIL", "JAWATAN", "NAMA", "JUMLAH HADIR", "JUMLAH TIDAK HADIR", "% KEHADIRAN"]],
         body: rows.map((r) => [r.bil, r.jawatan, r.nama, r.hadir, r.tidak, r.pct + "%"]),
         styles: { fontSize: 8 },
@@ -182,6 +188,7 @@ const ViewLaporan = (() => {
         [],
         ["HARI", Utils.hariFromDateStr(state.date)],
         ["DATE", Utils.displayDate(state.date)],
+        ["LOKASI", Store.getLokasi(state.date) || "-"],
         [],
         ["BIL", "JAWATAN", "NAMA", "HADIR", "TIDAK HADIR", "CATATAN"],
         ...data.map((r) => [r.bil, r.jawatan, r.nama, r.hadir, r.tidakHadir, r.catatan])
@@ -196,6 +203,9 @@ const ViewLaporan = (() => {
         ["LAPORAN KEHADIRAN BULANAN"],
         ["BULAN", Utils.displayYearMonth(state.yearMonth)],
         ["HARI PERJUMPAAN", dates.length],
+        [],
+        ["TARIKH", "LOKASI"],
+        ...dates.map((d) => [Utils.displayDate(d), Store.getLokasi(d) || "-"]),
         [],
         ["BIL", "JAWATAN", "NAMA", "JUMLAH HADIR", "JUMLAH TIDAK HADIR", "% KEHADIRAN"],
         ...rows.map((r) => [r.bil, r.jawatan, r.nama, r.hadir, r.tidak, r.pct + "%"])

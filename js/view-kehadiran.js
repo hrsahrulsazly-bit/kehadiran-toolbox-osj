@@ -10,6 +10,10 @@ const ViewKehadiran = (() => {
             <input type="date" id="att-date" class="input" value="${state.date}">
           </div>
         </div>
+        <div class="field-row" style="margin-bottom:0;">
+          <label>Lokasi Perjumpaan</label>
+          <input type="text" id="att-lokasi" class="input" placeholder="Taip lokasi (contoh: Tapak Kerja PLUS KM12)">
+        </div>
         <div class="report-meta" id="att-hari-label"></div>
       </div>
 
@@ -28,14 +32,21 @@ const ViewKehadiran = (() => {
     `;
 
     const dateInput = container.querySelector("#att-date");
+    const lokasiInput = container.querySelector("#att-lokasi");
     const searchInput = container.querySelector("#att-search");
     const kumpulanSelect = container.querySelector("#att-kumpulan");
     kumpulanSelect.value = state.kumpulan;
+    lokasiInput.value = Store.getLokasi(state.date);
 
     dateInput.addEventListener("change", () => {
       state.date = dateInput.value || Utils.todayStr();
+      lokasiInput.value = Store.getLokasi(state.date);
       renderDynamic(container);
     });
+    lokasiInput.addEventListener("input", Utils.debounce(() => {
+      Store.setLokasi(state.date, lokasiInput.value);
+      Utils.showToast("Lokasi disimpan");
+    }, 500));
     searchInput.addEventListener("input", Utils.debounce(() => {
       state.search = searchInput.value;
       renderList(container);

@@ -87,7 +87,7 @@ const ViewBulanan = (() => {
           <thead>
             <tr>
               <th class="name-col">Nama</th>
-              ${dates.map((d) => `<th title="${Utils.displayDate(d)}">${Utils.dayOnly(d)}</th>`).join("")}
+              ${dates.map((d) => `<th title="${Utils.displayDate(d)}${Store.getLokasi(d) ? " - " + Store.getLokasi(d) : ""}">${Utils.dayOnly(d)}</th>`).join("")}
               <th>Hadir</th>
               <th>Tidak</th>
               <th>%</th>
@@ -126,6 +126,7 @@ const ViewBulanan = (() => {
       <h3>${Utils.escapeHtml(emp.nama)}</h3>
       <div class="field-row"><label>Jawatan</label>${Utils.escapeHtml(emp.jawatan || "-")}</div>
       <div class="field-row"><label>Tarikh</label>${Utils.displayDate(date)} (${Utils.hariFromDateStr(date)})</div>
+      <div class="field-row"><label>Lokasi</label>${Utils.escapeHtml(Store.getLokasi(date) || "-")}</div>
       <div class="field-row"><label>Status</label><span style="color:${statusColor};font-weight:700;">${statusLabel}</span></div>
       <div class="field-row"><label>Catatan</label>${Utils.escapeHtml((rec && rec.catatan) || "-")}</div>
       <div class="modal-close-row">

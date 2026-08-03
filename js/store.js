@@ -2,6 +2,7 @@
 const Store = (() => {
   const KEY_EMPLOYEES = "tbosj_employees_v1";
   const KEY_ATTENDANCE = "tbosj_attendance_v1";
+  const KEY_MEETINGS = "tbosj_meetings_v1";
 
   function uid() {
     if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -35,6 +36,9 @@ const Store = (() => {
     }
     if (localStorage.getItem(KEY_ATTENDANCE) === null) {
       writeJSON(KEY_ATTENDANCE, []);
+    }
+    if (localStorage.getItem(KEY_MEETINGS) === null) {
+      writeJSON(KEY_MEETINGS, {});
     }
   }
 
@@ -95,6 +99,18 @@ const Store = (() => {
     return rec;
   }
 
+  // ---------- Meetings (lokasi per tarikh) ----------
+  function getLokasi(dateStr) {
+    const meetings = readJSON(KEY_MEETINGS, {});
+    return meetings[dateStr] || "";
+  }
+
+  function setLokasi(dateStr, lokasi) {
+    const meetings = readJSON(KEY_MEETINGS, {});
+    meetings[dateStr] = lokasi;
+    writeJSON(KEY_MEETINGS, meetings);
+  }
+
   function getDatesInMonth(yearMonth) {
     // yearMonth: "YYYY-MM" -> senarai tarikh unik (ada rekod) dlm bulan tsb, tersusun.
     const all = getAttendance().filter((a) => a.date && a.date.startsWith(yearMonth));
@@ -114,6 +130,8 @@ const Store = (() => {
     getAttendanceForDate,
     getAttendanceRecord,
     upsertAttendance,
+    getLokasi,
+    setLokasi,
     getDatesInMonth
   };
 })();
